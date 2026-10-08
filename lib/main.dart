@@ -1,6 +1,6 @@
-import \'package:flutter/material.dart\';
-import \'package:flutter/services.dart\';
-import \'package:google_generative_ai/google_generative_ai.dart\';
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:google_generative_ai/google_generative_ai.dart";
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: \'AI MASTER\',
+      title: "AI MASTER",
       theme: ThemeData.dark(useMaterial3: true),
       home: const HomePage(),
     );
@@ -41,10 +41,10 @@ class _HomePageState extends State<HomePage> {
     setState(() => _loading = true);
     try {
       final model = GenerativeModel(
-        model: \'gemini-1.5-flash\',
+        model: "gemini-1.5-flash",
         apiKey: _apiController.text.trim(),
         systemInstruction: Content.system(
-          \'You are an expert App and Website builder. Give complete code.\',
+          "You are an expert App and Website builder. Give complete code.",
         ),
       );
       final result = await model.generateContent([Content.text(_promptController.text)]);
