@@ -1,7 +1,6 @@
 import \'package:flutter/material.dart\';
+import \'package:flutter/services.dart\';
 import \'package:google_generative_ai/google_generative_ai.dart\';
-import \'package:flutter_markdown/flutter_markdown.dart\';
-import \'package:clipboard/clipboard.dart\';
 
 void main() {
   runApp(const MyApp());
@@ -38,7 +37,6 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     setState(() { _loading = true; });
-
     try {
       final model = GenerativeModel(
         model: \'gemini-1.5-flash\',
@@ -47,8 +45,7 @@ class _HomePageState extends State<HomePage> {
           \'Tum ek Expert AI App & Website Builder ho. User jo bhi bole uska pura clean code do. Agar app bole to Flutter code, agar website bole to single HTML file me HTML,CSS,JS do. Code hamesha complete aur ready-to-use dena.\'
         ),
       );
-      final content = [Content.text(_promptController.text)];
-      final result = await model.generateContent(content);
+      final result = await model.generateContent([Content.text(_promptController.text)]);
       setState(() { _response = result.text ?? "Koi jawab nahi mila"; });
     } catch (e) {
       setState(() { _response = "Error: $e"; });
@@ -80,7 +77,7 @@ class _HomePageState extends State<HomePage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _loading ? null : askGemini,
-                child: _loading ? const CircularProgressIndicator() : const Text("GENERATE KARO"),
+                child: _loading ? const SizedBox(height:20, width:20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text("GENERATE KARO"),
               ),
             ),
             const SizedBox(height: 10),
@@ -90,8 +87,9 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(10)),
                 child: Column(
                   children: [
-                    Expanded(child: Markdown(data: _response, selectable: true)),
-                    ElevatedButton.icon(onPressed: () { FlutterClipboard.copy(_response); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copy Ho Gaya"))); }, icon: const Icon(Icons.copy), label: const Text("Copy Code"))
+                    Expanded(child: SingleChildScrollView(child: SelectableText(_response))),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(onPressed: () { Clipboard.setData(ClipboardData(text: _response)); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copy Ho Gaya"))); }, icon: const Icon(Icons.copy), label: const Text("Copy Code"))
                   ],
                 ),
               ),
