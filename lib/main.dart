@@ -33,30 +33,32 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> askGemini() async {
     if (_apiController.text.isEmpty || _promptController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("API Key aur Prompt dono likho")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("API Key aur Prompt dono likho")),
+      );
       return;
     }
-    setState(() { _loading = true; });
+    setState(() => _loading = true);
     try {
       final model = GenerativeModel(
         model: \'gemini-1.5-flash\',
         apiKey: _apiController.text.trim(),
         systemInstruction: Content.system(
-          \'Tum ek Expert AI App & Website Builder ho. User jo bhi bole uska pura clean code do. Agar app bole to Flutter code, agar website bole to single HTML file me HTML,CSS,JS do. Code hamesha complete aur ready-to-use dena.\'
+          \'You are an expert App and Website builder. Give complete code.\',
         ),
       );
       final result = await model.generateContent([Content.text(_promptController.text)]);
-      setState(() { _response = result.text ?? "Koi jawab nahi mila"; });
+      setState(() => _response = result.text ?? "Koi jawab nahi mila");
     } catch (e) {
-      setState(() { _response = "Error: $e"; });
+      setState(() => _response = "Error: $e");
     }
-    setState(() { _loading = false; });
+    setState(() => _loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("AI MASTER - Gemini"), centerTitle: true),
+      appBar: AppBar(title: const Text("AI MASTER"), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -64,32 +66,44 @@ class _HomePageState extends State<HomePage> {
             TextField(
               controller: _apiController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: "Yahan Gemini API Key Paste Karo", border: OutlineInputBorder()),
+              decoration: const InputDecoration(labelText: "Gemini API Key", border: OutlineInputBorder()),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _promptController,
               maxLines: 3,
-              decoration: const InputDecoration(labelText: "Likhdo jaise: Ek calculator app banao", border: OutlineInputBorder()),
+              decoration: const InputDecoration(labelText: "Prompt likho", border: OutlineInputBorder()),
             ),
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _loading ? null : askGemini,
-                child: _loading ? const SizedBox(height:20, width:20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text("GENERATE KARO"),
+                child: _loading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text("GENERATE KARO"),
               ),
             ),
             const SizedBox(height: 10),
             Expanded(
               child: Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(10)),
                 child: Column(
                   children: [
-                    Expanded(child: SingleChildScrollView(child: SelectableText(_response))),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: SelectableText(_response),
+                      ),
+                    ),
                     const SizedBox(height: 10),
-                    ElevatedButton.icon(onPressed: () { Clipboard.setData(ClipboardData(text: _response)); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copy Ho Gaya"))); }, icon: const Icon(Icons.copy), label: const Text("Copy Code"))
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: _response));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copy Ho Gaya")));
+                      },
+                      icon: const Icon(Icons.copy),
+                      label: const Text("Copy Code"),
+                    ),
                   ],
                 ),
               ),
